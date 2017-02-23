@@ -9,7 +9,7 @@ mchimp-form(engine, options, data) =
 
    div#mc_embed_signup %
       form %
-         action = list-data.url
+         action = list-data.url.replace('subscribe?', 'subscribe/post?')
          method = "post"
          id = "mc-embedded-subscribe-form"
          name = "mc-embedded-subscribe-form"
@@ -34,7 +34,7 @@ mchimp-form(engine, options, data) =
                   style = "display:none"
             div %
                style = "position: absolute; left: -5000px;"
-               aria-hidden = "true"
+               "aria-hidden" = "true"
                input %
                   type = "text"
                   name = 'b_{options.account-id}_{list-data.id}'
@@ -44,7 +44,7 @@ mchimp-form(engine, options, data) =
                class = "clear"
                input %
                   type = "submit"
-                  value = engine.gen(data.label or "Subscribe!") ;; "Inscrivez-vous!"
+                  value = engine.gen(data.label or "Subscribe!")
                   name = "subscribe"
                   id = "mc-embedded-subscribe"
                   class = "button"
@@ -52,10 +52,6 @@ mchimp-form(engine, options, data) =
 cdn = '//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'
 
 install(@, options) =
-   ;; Plugin code goes here.
-   ;; TIP: you can test your plugin with the command:
-   ;; quaint -p ./lib -e 'code that uses your custom rule or macro'
-
    @register-resources with {
       cdn => {
          path = cdn
