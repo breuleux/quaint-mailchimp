@@ -18,7 +18,6 @@
     "chalk": "^1.1.3",
     "earlgrey-runtime": "^0.1.0",
     "inquirer-shortcuts": "^1.1.0",
-    "mailchimp-api": "^2.0.7",
     "mailchimp-api-v3": "^1.7.0"
   },
   "devDependencies": {
