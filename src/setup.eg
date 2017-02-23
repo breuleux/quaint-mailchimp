@@ -1,0 +1,43 @@
+
+require:
+   inquirer-shortcuts as inq
+   chalk
+   mailchimp-api-v3 as Mailchimp
+
+
+async quaint-setup(config, instructions) =
+   url = "https://github.com/breuleux/quaint-mailchimp"
+   print 'Plugin documentation: {chalk.bold.cyan(url)}'
+
+   data = config.plugins["mailchimp"] or= {=}
+
+   ;; Configure the plugin using inq.input, inq.confirm, inq.list, and so on.
+   ;; data.thing = await inq.input("Something", {default = "whatever"})
+
+   api-key = await inq.input("Mailchimp API key (will not be stored):")
+   print 'Fetching list info...'
+
+   mc = new Mailchimp(api-key)
+
+   info = await mc.get('/')
+
+   data &: {
+      ;; = api-key
+      account-id = info.account_id
+   }
+   
+   print 'Account name: {chalk.bold(info.account_name)}'
+
+   lists = (await mc.get('/lists')).lists
+
+   print 'Mailing lists:'
+   lists each l ->
+      print '* {chalk.bold(l.name)} ({l.id})'
+
+   data.lists = object with lists each l ->
+      {l.id, {name = l.name, id = l.id, url = l.subscribe_url_long}}
+   print ""
+   print '{chalk.yellow("Note")}: you must run the setup again if the lists change.'
+   print ""
+
+provide = quaint-setup

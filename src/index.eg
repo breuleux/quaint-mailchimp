@@ -1,0 +1,82 @@
+
+mchimp-form(engine, options, data) =
+
+   list-data = match data.list:
+      undefined? ->
+         items(options.lists)[0]??[1]
+      name >> name.shed().raw().trim() ->
+         (items(options.lists) each x when name in {x[1].name, x[1].id} -> x[1])[0]
+
+   div#mc_embed_signup %
+      form %
+         action = list-data.url
+         method = "post"
+         id = "mc-embedded-subscribe-form"
+         name = "mc-embedded-subscribe-form"
+         class = "validate"
+         target= "_blank"
+         novalidate = true
+         div#mc_embed_signup_scroll %
+            engine.gen(data.body or "Subscribe to our mailing list:")
+            div.mc-field-group %
+               input %
+                  type = "email"
+                  value = ""
+                  name = "EMAIL"
+                  class = "required email"
+                  id = "mce-EMAIL"
+                  placeholder = engine.gen(data.email-placeholder or "E-mail address")
+            div#mce-responses %
+               class = "clear"
+               div.response#mce-error-response %
+                  style = "display:none"
+               div.response#mce-success-response %
+                  style = "display:none"
+            div %
+               style = "position: absolute; left: -5000px;"
+               aria-hidden = "true"
+               input %
+                  type = "text"
+                  name = 'b_{options.account-id}_{list-data.id}'
+                  tabindex = "-1"
+                  value = ""
+            div %
+               class = "clear"
+               input %
+                  type = "submit"
+                  value = engine.gen(data.label or "Subscribe!") ;; "Inscrivez-vous!"
+                  name = "subscribe"
+                  id = "mc-embedded-subscribe"
+                  class = "button"
+
+cdn = '//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'
+
+install(@, options) =
+   ;; Plugin code goes here.
+   ;; TIP: you can test your plugin with the command:
+   ;; quaint -p ./lib -e 'code that uses your custom rule or macro'
+
+   @register-resources with {
+      cdn => {
+         path = cdn
+         path-is-url = true
+         contents = false
+         type = .js
+         method = .head
+         async = true
+      }
+   }
+   @register-macros with {
+      mailchimp(engine, body) =
+         data = engine.tools.to-data(body)
+         mchimp-form(engine, options, data)
+   }
+
+
+main(*match) =
+   {@, options = {=}} when @is-quaint-engine ->
+      install(@, options)
+   {options = {=}} ->
+      {@} -> main(@, options)
+
+provide = main
